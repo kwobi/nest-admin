@@ -16,12 +16,15 @@ export class CatsController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id:string){
-        return this.catsService.findOne(id);
+    findOne(@Param('id') id:number){
+        console.log(typeof id);
+        
+        return this.catsService.findOne(''+id);
     }
 
     @Post()
     create(@Body() createCatDto:CreateCatDto){
+        console.log(createCatDto instanceof CreateCatDto);
         return this.catsService.create(createCatDto);
     }
 
