@@ -29,6 +29,7 @@ export class CatsService {
 
     create(createCatDto:any){
         this.cats.push(createCatDto);
+        return createCatDto;
     }
 
     update(id:string, updateCatDto:any){

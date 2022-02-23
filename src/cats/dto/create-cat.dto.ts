@@ -1,5 +1,12 @@
+import {IsString} from 'class-validator';
+
 export class CreateCatDto {
-   readonly name:string;
-   readonly brand:string;
-   readonly flavor:string[];
+    @IsString()
+    readonly name:string;
+    
+    @IsString()
+    readonly brand:string;
+    
+    @IsString({each:true})
+    readonly flavor:string[];
 }
