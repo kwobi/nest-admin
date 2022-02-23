@@ -17,7 +17,7 @@ export class CatsService {
     }
 
     findOne(id:string){
-        
+        // throw 'A random error';  // 抛出异常、调试
         const cat =  this.cats.find(item => item.id === +id);
         if(!cat){
             // throw new HttpException(`没有找到id为${id}的猫`, HttpStatus.NOT_FOUND);

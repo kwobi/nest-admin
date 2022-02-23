@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
 import { response } from 'express';
 import { CatsService } from './cats.service';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { UpdateCatDto } from './dto/update-cat.dto';
 
 @Controller('cats')
 export class CatsController {
@@ -16,24 +18,20 @@ export class CatsController {
     @Get(':id')
     findOne(@Param('id') id:string){
         return this.catsService.findOne(id);
-        // return `This action returns #${id} coffee`;
     }
 
     @Post()
-    create(@Body() body){
-        // return body;
-        return this.catsService.create(body);
+    create(@Body() createCatDto:CreateCatDto){
+        return this.catsService.create(createCatDto);
     }
 
     @Patch(':id')
-    update(@Param('id') id:string, @Body() body){
-        // return `this action update #${id} coffee;`    
-        return this.catsService.update(id,body);
+    update(@Param('id') id:string, @Body() updateCatDto:UpdateCatDto){
+        return this.catsService.update(id,updateCatDto);
     }
 
     @Delete(':id')  
     remove(@Param('id') id:string){
-        // return `this action remove #${id} coffee;`
         return this.catsService.remove(id);
     }
 
