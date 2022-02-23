@@ -1,49 +1,58 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { UpdateCatDto } from './dto/update-cat.dto';
 import { Cats } from './entities/cats.entity';
 
 @Injectable()
 export class CatsService { 
-    private cats:Cats[] = [
-        {
-        id:1,
-        name:'狸花猫',
-        brand:'lihua',
-        flavor:['chocolate','vanilla']
-        },
-    ];
+    // private cats:Cats[] = [
+    //     {
+    //     id:1,
+    //     name:'狸花猫',
+    //     brand:'lihua',
+    //     flavor:['chocolate','vanilla']
+    //     },
+    // ];
+
+    constructor(
+        @InjectRepository(Cats)
+        private readonly catRepository: Repository<Cats>,
+    ){}
 
     findAll(){
-        return this.cats;
+        // return this.cats;
+        return this.catRepository.find();
     }
 
-    findOne(id:string){
-        // throw 'A random error';  // 抛出异常、调试
-        const cat =  this.cats.find(item => item.id === +id);
+    async findOne(id:string){
+        const cat = await this.catRepository.findOne(id);
         if(!cat){
-            // throw new HttpException(`没有找到id为${id}的猫`, HttpStatus.NOT_FOUND);
-            // 这种写法更简洁、优雅
             throw new NotFoundException(`没有找到id为${id}的猫`);
         }
         return cat
     }
 
-    create(createCatDto:any){
-        this.cats.push(createCatDto);
-        return createCatDto;
+    create(createCatDto:CreateCatDto){
+        const cat = this.catRepository.create(createCatDto);
+        return this.catRepository.save(cat);
     }
 
-    update(id:string, updateCatDto:any){
-        const existingCat = this.findOne(id);
-        if(existingCat){
-
+    async update(id:string, updateCatDto:UpdateCatDto){
+        const cat = await this.catRepository.preload({
+            id: +id,
+            ...updateCatDto,
+        });
+        if(!cat){
+            throw new NotFoundException(`没有找到id为${id}的猫`);
         }
+        return this.catRepository.save(cat);
     }
 
-    remove(id:string){
-        const catIndex = this.cats.findIndex(item => item.id === +id);
-        if(catIndex !== -1){
-            this.cats.splice(catIndex,1);
-        }
+    async remove(id:string){
+        const catIndex = await this.findOne(id);
+        return this.catRepository.remove(catIndex);
     }
 
 }
