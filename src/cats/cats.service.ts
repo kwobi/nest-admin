@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Cats } from './entities/cats.entity';
 
 @Injectable()
@@ -17,7 +17,14 @@ export class CatsService {
     }
 
     findOne(id:string){
-        return this.cats.find(item => item.id === +id);
+        
+        const cat =  this.cats.find(item => item.id === +id);
+        if(!cat){
+            // throw new HttpException(`没有找到id为${id}的猫`, HttpStatus.NOT_FOUND);
+            // 这种写法更简洁、优雅
+            throw new NotFoundException(`没有找到id为${id}的猫`);
+        }
+        return cat
     }
 
     create(createCatDto:any){
