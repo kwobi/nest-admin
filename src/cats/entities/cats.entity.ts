@@ -7,7 +7,11 @@ export class Cats {
     id:number;
 
     @Column()
-    name:string;
+    // name:string;
+    title:string;
+
+    @Column( {nullable:true} )
+    description:string;
 
     @Column()
     brand:string;

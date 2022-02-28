@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CatsRatingModule } from './cats-rating/cats-rating.module';
 
 
 @Module({
@@ -17,7 +18,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'postgres',
       autoLoadEntities: true,
       synchronize: true,
-    }),
+    }), CatsRatingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
