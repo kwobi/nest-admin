@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Flavor } from "./flavor.entity";
 
 @Entity()  //sql table === 括号里面的名字 ,不配置就默认为小写类名;
 export class Cats {
@@ -11,6 +12,13 @@ export class Cats {
     @Column()
     brand:string;
 
-    @Column('json',{nullable:true})
-    flavor:string[];
+    @JoinTable()
+    @ManyToMany(
+        type => Flavor , 
+        flavor => flavor.cats,
+        {
+            cascade: true,
+        }
+        )
+    flavor:Flavor[];
 }
