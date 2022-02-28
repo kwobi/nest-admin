@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { query } from 'express';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
-import { Repository } from 'typeorm';
+import { Event } from 'src/events/entities/event.entity';
+import { Connection, Repository } from 'typeorm';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { Cats } from './entities/cats.entity';
@@ -9,14 +11,6 @@ import { Flavor } from './entities/flavor.entity';
 
 @Injectable()
 export class CatsService { 
-    // private cats:Cats[] = [
-    //     {
-    //     id:1,
-    //     name:'狸花猫',
-    //     brand:'lihua',
-    //     flavor:['chocolate','vanilla']
-    //     },
-    // ];
 
     constructor(
         @InjectRepository(Cats)
@@ -24,6 +18,7 @@ export class CatsService {
 
         @InjectRepository(Flavor)
         private readonly flavorRepository: Repository<Flavor>,
+        private readonly connection: Connection
     ){}
 
     findAll(paginationQuery:PaginationQueryDto){
@@ -82,6 +77,32 @@ export class CatsService {
         const catIndex = await this.findOne(id);
         return this.catRepository.remove(catIndex);
     }
+
+    async recommendCat(cat: Cats){
+        const queryRunner = this.connection.createQueryRunner();
+        //链接数据库 并开启事务 
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try{
+            cat.recommendations++;
+
+            const recommendEvent = new Event();
+            recommendEvent.name = 'recommend_cat';
+            recommendEvent.type = 'cat';
+            recommendEvent.payload = { catID:cat.id };
+
+            await queryRunner.manager.save(cat);
+            await queryRunner.manager.save(recommendEvent);
+
+            await queryRunner.commitTransaction();
+        }catch(err){
+            await queryRunner.rollbackTransaction();
+        } finally{
+            await queryRunner.release();
+        }
+    }
+
 
     private async preloadFlavorByName(name:string):Promise<Flavor>{
         const existingFlavor = await this.flavorRepository.findOne({name});
