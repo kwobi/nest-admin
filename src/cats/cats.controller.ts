@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
 import { response } from 'express';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
@@ -9,10 +10,11 @@ export class CatsController {
     constructor(private catsService:CatsService){}
 
     @Get()
-    findAll(@Query() paginationQuery){
+    findAll(@Query() paginationQuery: PaginationQueryDto){
         // const {limit,offset} = paginationQuery;
-        return this.catsService.findAll();
         // return `This action returns all cats.Limit: ${limit}, offset: ${offset}`;
+        
+        return this.catsService.findAll(paginationQuery);
     }
 
     @Get(':id')

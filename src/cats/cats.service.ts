@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 import { Repository } from 'typeorm';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
@@ -25,10 +26,13 @@ export class CatsService {
         private readonly flavorRepository: Repository<Flavor>,
     ){}
 
-    findAll(){
+    findAll(paginationQuery:PaginationQueryDto){
         // return this.cats;
+        const {limit,offset} = paginationQuery;
         return this.catRepository.find({
-            relations:['flavor']
+            relations:['flavor'],
+            skip:offset,
+            take:limit,
         });
     }
 
